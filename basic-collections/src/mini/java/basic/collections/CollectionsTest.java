@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 public class CollectionsTest {
 
+
     @org.junit.Test
     public void listAdd() {
         List<String> l = new ArrayList<>();
@@ -47,18 +48,6 @@ public class CollectionsTest {
                              .collect(Collectors.toList());
         List<String> l2 = new ArrayList<>();
 
-        list.forEach(element -> {
-            if (!element.equals("b"))
-                l2.add(element);
-        });
-
-        List<String> l3 = new ArrayList<>();
-        for (String element : list) {
-            if (!element.equals("b"))
-                l3.add(element);
-        }
-
-
         assertEquals(l, List.of("a"));
     }
 
@@ -79,14 +68,16 @@ public class CollectionsTest {
         hashSet.forEach(s -> System.out.printf("%s,", s));
         System.out.println();
         System.out.print("LinkedHashSet: ");
-        linkedHashSet.forEach(s -> System.out.printf("%s,", s));
+        for (String s1 : linkedHashSet) {
+            System.out.printf("%s,", s1);
+        }
         System.out.println();
         hashSet.add("c");
         linkedHashSet.add("c");
         hashSet.add("d");
         linkedHashSet.add("d");
         System.out.print("Hashset: ");
-        hashSet.forEach(s -> System.out.printf("%s,", s));
+        hashSet.forEach(s1 -> System.out.printf("%s,", s1));
         System.out.println();
         System.out.print("LinkedHashSet: ");
         linkedHashSet.forEach(s -> System.out.printf("%s,", s));
@@ -125,7 +116,7 @@ public class CollectionsTest {
 
 
         Integer a = 3;
-        hashMap.get(a.getClass()).print(a);
+        hashMap.getOrDefault(a.getClass(), new DefaultLogger()).print(a);
         Object b = new String("3");
         hashMap.getOrDefault(b.getClass(), new DefaultLogger()).print(b);
         Object c = new ArrayList<>();
@@ -186,11 +177,17 @@ public class CollectionsTest {
 
     }
 
+
     private void printForObject(Map<Class, Printer> hashMap, Object d) throws StupidException {
         try {
             hashMap.get(d.getClass()).print(d);
         } catch (NullPointerException e) {
-            throw new StupidException(List.of("stupid"));
+
+            new DefaultLogger().print(String.format("Exception ifnored for %s", d.getClass().toGenericString()));
+            // Throws RuntimeException does not need to be handled
+            // throw new RuntimeException();
+            // Throw normal Exception, needs to be either try{}/catched{} or added to method definition (throws)
+            // throw new StupidException(List.of("stupid"));
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
@@ -198,9 +195,8 @@ public class CollectionsTest {
         }
     }
 
-    private class StupidException extends Throwable {
+    private class StupidException extends Exception {
         private List<String> a;
-
         public StupidException(List<String> a) {
             this.a = a;
         }
